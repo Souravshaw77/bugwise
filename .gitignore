@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+.env
+venv/
+
+# Node (if added later)
+node_modules/
+
+# SQLite
+*.db
+
+# OS
+.DS_Store
