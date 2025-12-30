@@ -1,9 +1,6 @@
 from flask import Flask, send_from_directory
 from flask_cors import CORS
 from routes.bugs import bugs_bp
-import os
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(
     __name__,
@@ -13,18 +10,19 @@ app = Flask(
 
 CORS(app)
 
-
+# API routes
 app.register_blueprint(bugs_bp, url_prefix="/api")
 
-
+# Serve frontend
 @app.route("/")
-def serve_frontend():
+def serve_index():
     return send_from_directory(app.static_folder, "index.html")
 
-
-@app.route("/<path:filename>")
-def serve_static_files(filename):
-    return send_from_directory(app.static_folder, filename)
+# Serve static files explicitly (important for Render)
+@app.route("/<path:path>")
+def serve_static_files(path):
+    return send_from_directory(app.static_folder, path)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run()
+

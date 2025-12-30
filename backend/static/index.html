@@ -5,21 +5,23 @@
   <title>Bugwise | Debug Smarter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Tailwind CDN (OK for now, warning is harmless) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  
-  <link rel="stylesheet" href="/static/styles.css" />
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 
-<body class="bg-gray-100 text-gray-900">
-  <div class="max-w-4xl mx-auto p-6">
+<body class="bg-gray-100 text-gray-900 min-h-screen">
+  <div class="max-w-4xl mx-auto px-4 py-8">
 
+    <!-- Header -->
     <h1 class="text-3xl font-bold mb-2">🐞 Bugwise</h1>
     <p class="text-gray-600 mb-6">
       Paste your bug. Get a clear explanation and fix.
     </p>
 
-   
+    <!-- Input Card -->
     <div class="card mb-6">
       <label class="block mb-2 font-medium">Bug / Error Message</label>
 
@@ -41,7 +43,7 @@
       <button
         id="analyzeBtn"
         type="button"
-        class="btn-primary"
+        class="btn-primary mt-2"
       >
         Analyze Bug
       </button>
@@ -49,12 +51,12 @@
       <p id="errorMsg" class="text-red-600 mt-3 hidden"></p>
     </div>
 
-    
+    <!-- Loading -->
     <div id="loading" class="hidden text-center mb-6">
       <p class="text-gray-600 animate-pulse">Analyzing bug…</p>
     </div>
 
-   
+    <!-- Result -->
     <div id="result" class="hidden card mb-6">
       <h2 class="section-title">Explanation</h2>
       <p id="explanation" class="mb-4"></p>
@@ -69,7 +71,7 @@
       <pre id="exampleCode" class="code-block"></pre>
     </div>
 
-    
+    <!-- History -->
     <div class="card">
       <h2 class="section-title mb-4">Recent Bugs</h2>
       <ul id="historyList" class="space-y-2"></ul>
@@ -77,6 +79,7 @@
 
   </div>
 
-  <script src="/static/main.js"></script>
+  <!-- Main JS -->
+  <script src="/main.js"></script>
 </body>
 </html>

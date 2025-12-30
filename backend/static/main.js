@@ -7,7 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const errorMsg = document.getElementById("errorMsg");
   const historyEl = document.getElementById("historyList");
 
-  
+  if (!analyzeBtn) {
+    console.error("Analyze button not found. JS not wired correctly.");
+    return;
+  }
+
+  // Restore last analysis
   const cached = localStorage.getItem("lastAnalysis");
   if (cached) {
     try {
@@ -34,26 +39,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     analyzeBtn.disabled = true;
     analyzeBtn.textContent = "Analyzing…";
-    analyzeBtn.classList.add("opacity-50", "cursor-not-allowed");
 
     try {
       const response = await fetch(`${API_BASE}/analyze-bug`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bug_text: bugText,
-          language: language || null
-        })
+        body: JSON.stringify({ bug_text: bugText, language })
       });
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
+      if (!response.ok) throw new Error("API failed");
 
       const data = await response.json();
       renderResult(data);
       localStorage.setItem("lastAnalysis", JSON.stringify(data));
-      await loadHistory();
+      loadHistory();
 
     } catch (err) {
       console.error(err);
@@ -63,20 +62,15 @@ document.addEventListener("DOMContentLoaded", () => {
       loading.classList.add("hidden");
       analyzeBtn.disabled = false;
       analyzeBtn.textContent = "Analyze Bug";
-      analyzeBtn.classList.remove("opacity-50", "cursor-not-allowed");
     }
   });
 
   function renderResult(data) {
-    document.getElementById("explanation").textContent =
-      data.explanation || "";
-
-    document.getElementById("rootCause").textContent =
-      data.root_cause || "";
+    document.getElementById("explanation").textContent = data.explanation || "";
+    document.getElementById("rootCause").textContent = data.root_cause || "";
 
     const fixSteps = document.getElementById("fixSteps");
     fixSteps.innerHTML = "";
-
     (data.fix_steps || []).forEach(step => {
       const li = document.createElement("li");
       li.textContent = step;
@@ -92,31 +86,24 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadHistory() {
     try {
       const res = await fetch(`${API_BASE}/bugs`);
-      if (!res.ok) return;
-
       const bugs = await res.json();
+
       historyEl.innerHTML = "";
 
       if (!bugs.length) {
-        const li = document.createElement("li");
-        li.className = "text-gray-500 italic";
-        li.textContent = "No bugs analyzed yet.";
-        historyEl.appendChild(li);
+        historyEl.innerHTML = `<li class="text-gray-500 italic">No bugs yet.</li>`;
         return;
       }
 
       bugs.forEach(bug => {
         const li = document.createElement("li");
-        li.className =
-          "cursor-pointer border-b pb-2 hover:text-blue-600";
+        li.className = "cursor-pointer border-b pb-2 hover:text-blue-600";
+        li.textContent = `${bug.language || "Unknown"} – ${bug.bug_text.slice(0, 80)}…`;
 
-        li.textContent =
-          `${bug.language || "Unknown"} – ${bug.bug_text.slice(0, 80)}…`;
-
-        li.addEventListener("click", () => {
+        li.onclick = () => {
           renderResult(bug);
           localStorage.setItem("lastAnalysis", JSON.stringify(bug));
-        });
+        };
 
         historyEl.appendChild(li);
       });
