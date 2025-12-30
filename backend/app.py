@@ -1,6 +1,7 @@
 from flask import Flask, send_from_directory
 from flask_cors import CORS
-from routes.bugs import bugs_bp
+from backend.routes.bugs import bugs_bp
+
 import os
 
 app = Flask(
