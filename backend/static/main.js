@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const API_BASE = "http://127.0.0.1:5000/api";
+  const API_BASE = "/api";
 
   const analyzeBtn = document.getElementById("analyzeBtn");
   const loading = document.getElementById("loading");
@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const errorMsg = document.getElementById("errorMsg");
   const historyEl = document.getElementById("historyList");
 
-  // Restore last analysis (page refresh safety)
+  
   const cached = localStorage.getItem("lastAnalysis");
   if (cached) {
     try {
@@ -47,11 +47,10 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (!response.ok) {
-        throw new Error("API request failed");
+        throw new Error(`API error: ${response.status}`);
       }
 
       const data = await response.json();
-
       renderResult(data);
       localStorage.setItem("lastAnalysis", JSON.stringify(data));
       await loadHistory();
@@ -60,7 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error(err);
       errorMsg.textContent = "Something went wrong. Please try again.";
       errorMsg.classList.remove("hidden");
-
     } finally {
       loading.classList.add("hidden");
       analyzeBtn.disabled = false;
@@ -69,9 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // -----------------------------
-  // Render AI result
-  // -----------------------------
   function renderResult(data) {
     document.getElementById("explanation").textContent =
       data.explanation || "";
@@ -94,14 +89,12 @@ document.addEventListener("DOMContentLoaded", () => {
     result.classList.remove("hidden");
   }
 
-  // -----------------------------
-  // Load history from backend
-  // -----------------------------
   async function loadHistory() {
     try {
       const res = await fetch(`${API_BASE}/bugs`);
-      const bugs = await res.json();
+      if (!res.ok) return;
 
+      const bugs = await res.json();
       historyEl.innerHTML = "";
 
       if (!bugs.length) {
@@ -121,22 +114,14 @@ document.addEventListener("DOMContentLoaded", () => {
           `${bug.language || "Unknown"} – ${bug.bug_text.slice(0, 80)}…`;
 
         li.addEventListener("click", () => {
-          const analysis = {
-            explanation: bug.explanation,
-            root_cause: bug.root_cause,
-            fix_steps: bug.fix_steps || [],
-            example_code: bug.example_code
-          };
-
-          renderResult(analysis);
-          localStorage.setItem("lastAnalysis", JSON.stringify(analysis));
+          renderResult(bug);
+          localStorage.setItem("lastAnalysis", JSON.stringify(bug));
         });
 
         historyEl.appendChild(li);
       });
-
     } catch (err) {
-      console.error("Failed to load history", err);
+      console.error("History load failed", err);
     }
   }
 
