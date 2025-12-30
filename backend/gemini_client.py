@@ -2,7 +2,8 @@ import os
 import json
 import re
 from typing import Dict, List
-from openai import OpenAI
+
+
 
 
 SYSTEM_PROMPT = """
