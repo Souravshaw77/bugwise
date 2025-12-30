@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bugwise | Debug Smarter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+  <div class="max-w-4xl mx-auto p-6">
+
+    <h1 class="text-3xl font-bold mb-2">🐞 Bugwise</h1>
+    <p class="text-gray-600 mb-6">
+      Paste your bug. Get a clear explanation and fix.
+    </p>
+
+   
+    <div class="card mb-6">
+      <label class="block mb-2 font-medium">Bug / Error Message</label>
+
+      <textarea
+        id="bugText"
+        rows="5"
+        class="input mb-4"
+        placeholder="Paste the error or bug here..."
+      ></textarea>
+
+      <label class="block mb-2 font-medium">Language / Tech</label>
+      <input
+        id="language"
+        type="text"
+        class="input mb-4"
+        placeholder="e.g. Python, JavaScript, React"
+      />
+
+      <button
+        id="analyzeBtn"
+        type="button"
+        class="btn-primary"
+      >
+        Analyze Bug
+      </button>
+
+      <p id="errorMsg" class="text-red-600 mt-3 hidden"></p>
+    </div>
+
+    
+    <div id="loading" class="hidden text-center mb-6">
+      <p class="text-gray-600 animate-pulse">Analyzing bug…</p>
+    </div>
+
+   
+    <div id="result" class="hidden card mb-6">
+      <h2 class="section-title">Explanation</h2>
+      <p id="explanation" class="mb-4"></p>
+
+      <h2 class="section-title">Root Cause</h2>
+      <p id="rootCause" class="mb-4"></p>
+
+      <h2 class="section-title">Fix Steps</h2>
+      <ul id="fixSteps" class="list-disc ml-6 mb-4"></ul>
+
+      <h2 class="section-title">Example Code</h2>
+      <pre id="exampleCode" class="code-block"></pre>
+    </div>
+
+    
+    <div class="card">
+      <h2 class="section-title mb-4">Recent Bugs</h2>
+      <ul id="historyList" class="space-y-2"></ul>
+    </div>
+
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
