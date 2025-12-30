@@ -5,86 +5,47 @@
   <title>Bugwise | Debug Smarter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Tailwind (OK for now, warning is harmless) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Custom styles -->
-  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 
-<body class="bg-gray-100 text-gray-900 min-h-screen">
+<body>
+  <div class="container">
+    <h1>🐞 Bugwise</h1>
+    <p class="subtitle">Paste your bug. Get a clear explanation and fix.</p>
 
-  <main class="max-w-4xl mx-auto px-4 py-8">
+    <div class="card">
+      <label>Bug / Error Message</label>
+      <textarea id="bugText" rows="5" placeholder="Paste the error or bug here..."></textarea>
 
-    <!-- Header -->
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold flex items-center gap-2">
-        🐞 Bugwise
-      </h1>
-      <p class="text-gray-600 mt-1">
-        Paste your bug. Get a clear explanation and fix.
-      </p>
-    </header>
+      <label>Language / Tech</label>
+      <input id="language" type="text" placeholder="e.g. Python, JavaScript" />
 
-    <!-- Bug Input -->
-    <section class="card mb-8">
-      <label class="block font-medium mb-2">Bug / Error Message</label>
-
-      <textarea
-        id="bugText"
-        rows="5"
-        class="input mb-4"
-        placeholder="Paste the error or bug here..."
-      ></textarea>
-
-      <label class="block font-medium mb-2">Language / Tech</label>
-      <input
-        id="language"
-        type="text"
-        class="input mb-6"
-        placeholder="e.g. Python, JavaScript"
-      />
-
-      <button
-        id="analyzeBtn"
-        class="btn-primary w-fit"
-        type="button"
-      >
-        Analyze Bug
-      </button>
-
-      <p id="errorMsg" class="text-red-600 mt-4 hidden"></p>
-    </section>
-
-    <!-- Loading -->
-    <div id="loading" class="hidden text-center mb-8">
-      <p class="text-gray-600 animate-pulse">Analyzing bug…</p>
+      <button id="analyzeBtn">Analyze Bug</button>
+      <p id="errorMsg" class="error hidden"></p>
     </div>
 
-    <!-- Result -->
-    <section id="result" class="hidden card mb-8">
-      <h2 class="section-title">Explanation</h2>
-      <p id="explanation" class="mb-6"></p>
+    <div id="loading" class="hidden">Analyzing bug…</div>
 
-      <h2 class="section-title">Root Cause</h2>
-      <p id="rootCause" class="mb-6"></p>
+    <div id="result" class="card hidden">
+      <h2>Explanation</h2>
+      <p id="explanation"></p>
 
-      <h2 class="section-title">Fix Steps</h2>
-      <ul id="fixSteps" class="list-disc ml-6 mb-6"></ul>
+      <h2>Root Cause</h2>
+      <p id="rootCause"></p>
 
-      <h2 class="section-title">Example Code</h2>
-      <pre id="exampleCode" class="code-block"></pre>
-    </section>
+      <h2>Fix Steps</h2>
+      <ul id="fixSteps"></ul>
 
-    <!-- History -->
-    <section class="card">
-      <h2 class="section-title mb-4">Recent Bugs</h2>
-      <ul id="historyList" class="space-y-2"></ul>
-    </section>
+      <h2>Example Code</h2>
+      <pre id="exampleCode"></pre>
+    </div>
 
-  </main>
+    <div class="card">
+      <h2>Recent Bugs</h2>
+      <ul id="historyList"></ul>
+    </div>
+  </div>
 
-  <!-- JS -->
-  <script src="/static/main.js"></script>
+  <script src="/main.js"></script>
 </body>
 </html>
