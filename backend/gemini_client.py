@@ -3,7 +3,7 @@ import json
 import re
 from typing import Dict, List
 
-
+from openai import OpenAI  
 
 
 SYSTEM_PROMPT = """
@@ -26,21 +26,15 @@ JSON schema (must match exactly):
 
 
 def extract_json(text: str) -> Dict:
-    """
-    Robust JSON extraction from LLM output.
-    Handles:
-    - clean JSON
-    - markdown-wrapped JSON
-    - extra text before/after JSON
-    """
     text = text.strip()
 
-
+    # 1. Try clean JSON
     try:
         return json.loads(text)
     except json.JSONDecodeError:
         pass
 
+    # 2. Extract first JSON object found
     match = re.search(r"\{[\s\S]*\}", text)
     if match:
         try:
@@ -51,7 +45,7 @@ def extract_json(text: str) -> Dict:
     raise ValueError("Could not parse valid JSON from AI response")
 
 
-class GeminiClient:  
+class GeminiClient:
     def __init__(self):
         api_key = os.getenv("OPENROUTER_API_KEY")
         if not api_key:
@@ -59,12 +53,12 @@ class GeminiClient:
 
         self.client = OpenAI(
             api_key=api_key,
-            base_url="https://openrouter.ai/api/v1"
+            base_url="https://openrouter.ai/api/v1",
         )
 
-        
+        # Stable, cheap, reliable
         self.model = "mistralai/mistral-7b-instruct"
-        
+
 
     def analyze_bug(self, bug_text, language=None, context=None) -> Dict:
         prompt = f"""
@@ -104,7 +98,7 @@ Analyze the bug and return structured JSON.
             print("OpenRouter failed, using fallback:", e)
             return self._fallback_analysis(bug_text, language, context)
 
-    
+
     def _fallback_analysis(self, bug_text, language=None, context=None) -> Dict:
         text = (bug_text or "").lower()
 
@@ -140,9 +134,8 @@ Analyze the bug and return structured JSON.
                 "Verify function return values",
             ]
             example_code = (
-                "if (data) {\n"
-                "  console.log(data.length);\n"
-                "}"
+                "if data:\n"
+                "    print(len(data))"
             )
 
         elif "typeerror" in text:

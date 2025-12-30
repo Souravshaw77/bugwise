@@ -1,17 +1,16 @@
 import sqlite3
-from datetime import datetime
+import os
 
-DB_NAME = "bugwise.db"
-
+DB_PATH = os.path.join(os.path.dirname(__file__), "bugwise.db")
 
 def get_connection():
-    return sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    ensure_tables(conn)
+    return conn
 
-
-def init_db():
-    conn = get_connection()
+def ensure_tables(conn):
     cursor = conn.cursor()
-
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS bugs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,6 +24,4 @@ def init_db():
             created_at TEXT NOT NULL
         )
     """)
-
     conn.commit()
-    conn.close()
