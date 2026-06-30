@@ -1,11 +1,11 @@
 import os
 import json
 import re
-import requests
-from typing import Dict, List
+from typing import Dict
 
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-MODEL = "mistralai/mistral-7b-instruct"
+from google import genai
+
+MODEL = "gemini-2.5-flash"
 
 SYSTEM_PROMPT = """
 You are a senior software engineer helping junior developers debug errors.
@@ -43,18 +43,15 @@ def extract_json(text: str) -> Dict:
 
 class GeminiClient:
     def __init__(self):
-        self.api_key = os.getenv("OPENROUTER_API_KEY")
-        if not self.api_key:
-            raise RuntimeError("OPENROUTER_API_KEY not set")
+        self.api_key = os.getenv("GEMINI_API_KEY")
 
-        self.headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://bugwise.onrender.com",
-            "X-Title": "Bugwise",
-        }
+        if not self.api_key:
+            raise RuntimeError("GEMINI_API_KEY not set")
+
+        self.client = genai.Client(api_key=self.api_key)
 
     def analyze_bug(self, bug_text, language=None, context=None) -> Dict:
+
         prompt = f"""
 Bug/Error:
 {bug_text}
@@ -68,25 +65,13 @@ Context:
 Analyze the bug and return structured JSON.
 """
 
-        payload = {
-            "model": MODEL,
-            "messages": [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": prompt},
-            ],
-            "temperature": 0.2,
-        }
-
         try:
-            response = requests.post(
-                OPENROUTER_URL,
-                headers=self.headers,
-                json=payload,
-                timeout=30,
+            response = self.client.models.generate_content(
+                model=MODEL,
+                contents=f"{SYSTEM_PROMPT}\n\n{prompt}"
             )
 
-            response.raise_for_status()
-            raw_text = response.json()["choices"][0]["message"]["content"]
+            raw_text = response.text
             data = extract_json(raw_text)
 
             return {
@@ -97,7 +82,7 @@ Analyze the bug and return structured JSON.
             }
 
         except Exception as e:
-            print("OpenRouter failed, using fallback:", e)
+            print("Gemini failed, using fallback:", e)
             return self._fallback_analysis(bug_text)
 
     def _fallback_analysis(self, bug_text) -> Dict:
@@ -107,22 +92,49 @@ Analyze the bug and return structured JSON.
             "The AI service could not be reached. "
             "A basic rule-based analysis is provided."
         )
+
         root_cause = "A common programming error occurred."
+
         fix_steps = [
             "Check boundary conditions",
             "Validate inputs",
             "Add defensive checks",
         ]
+
         example_code = ""
 
         if "index" in text:
             root_cause = "Index access outside valid bounds."
+
             fix_steps = [
                 "Check list length before access",
                 "Fix loop boundaries",
                 "Use safe iteration",
             ]
-            example_code = "for item in my_list:\n    print(item)"
+
+            example_code = """for item in my_list:
+    print(item)"""
+
+        elif "null" in text or "none" in text:
+            root_cause = "A null/None value is being accessed."
+
+            fix_steps = [
+                "Check if the object is None before using it.",
+                "Initialize the variable properly.",
+                "Add defensive null checks."
+            ]
+
+            example_code = """if obj is not None:
+    obj.method()"""
+
+        elif "syntax" in text:
+            root_cause = "There is a syntax error in the code."
+
+            fix_steps = [
+                "Check brackets and parentheses.",
+                "Check indentation.",
+                "Review commas, colons, and quotes."
+            ]
 
         return {
             "explanation": explanation,

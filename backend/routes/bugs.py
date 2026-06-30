@@ -2,8 +2,8 @@ from flask import Blueprint, request, jsonify
 import json
 from datetime import datetime
 
-from backend.database import get_connection
-from backend.gemini_client import GeminiClient
+from database import get_connection
+from gemini_client import GeminiClient
 
 bugs_bp = Blueprint("bugs", __name__)
 

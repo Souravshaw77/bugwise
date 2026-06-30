@@ -1,8 +1,8 @@
 from flask import Flask, send_from_directory
 from flask_cors import CORS
-from backend.routes.bugs import bugs_bp
-from backend.database import get_connection
-from backend.gemini_client import GeminiClient
+from routes.bugs import bugs_bp
+from database import get_connection
+from gemini_client import GeminiClient
 
 
 import os
